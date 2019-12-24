@@ -114,11 +114,15 @@
   </div>
 
   <script>
-    let username = "brentalexander";
+    const username = "brentalexander";
+    let lastData = false;
     
     function watchdog() {
-      $.get( "https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=" + username + "&api_key=1f633977acf0e2d0630ec11dbc350d3e&format=json", function( data ) 
-      {
+      $.get( "https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=" + username + "&api_key=1f633977acf0e2d0630ec11dbc350d3e&format=json", function( data ) {
+        // check if data has been updated; if not, then return
+        if (data === lastData) return;
+        // cache the data
+        lastData = data;
         // now playing
         let now = data.recenttracks.track[0];
         if (typeof now["@attr"] != "undefined")
