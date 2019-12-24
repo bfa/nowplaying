@@ -1,17 +1,153 @@
 <html>
+<head>
+  <title>Now Playing in Web Pro</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <style>
+    html {
+      background-color: #111;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      font-family: Gotham;
+      font-size: 150%;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    #container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      width: 100vw;
+      height: 100vh;
+      line-height: 1.5;
+    }
+    #bg {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background-size: cover;
+      background-position: center center;
+      opacity: 0.5;
+      filter: blur(25px);
+    }
+    h1 {
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 1em;
+      opacity: 0.5;
+    }
+    #now {
+      display: none;
+      margin: 16px;
+      text-align: center;
+      width: 50%;
+    }
+    #now img {
+      width: 400px;
+      height: 400px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+      margin: 16px;
+      border-radius: 8px;
+    }
+    #track {
+      font-weight: bold;
+      font-size: larger;
+      margin-bottom: 0.5em;
+    }
+    #artist {
+      margin-bottom: 0.5em;
+    }
+    #album {
+      font-size: smaller;
+      opacity: 0.75;
+    }
+    #recent {
+      display: none;
+      font-size: smaller;
+      width: 50%;
+    }
+    #recent .track {
+      display: flex;
+      align-items: center;
+      margin: 8px 0;
+    }
+    #recent h1 {
+      margin: 8px;
+    }
+    #recent .track > * {
+      margin: 8px;
+    }
+    #recent .artwork img {
+      display: block;
+      border-radius: 4px;
+    }
+    #recent .name {
+      font-weight: bold;
+    }
+  </style>
+</head>
+  <body>  
+  
+  <div id="container">
+    <div id="bg"></div>
+    <h1 id="not-playing">NO MUSIC CURRENTLY PLAYING</h1>
+    <div id="now">
+      <h1>NOW PLAYING</h1>
+      <img id="artwork" src="">
+      <div id="track"></div>
+      <div id="artist"></div>
+      <div id="album"></div>
+    </div>
+    <div id="recent">
+      <h1>RECENTLY PLAYED</h1>
+      <div id="tracks"></div>
+    </div>
+  </div>
 
-<div id="container">
-  <div id="bg"></div>
-  <h1 id="not-playing">NO MUSIC CURRENTLY PLAYING</h1>
-  <div id="now">
-    <h1>NOW PLAYING</h1>
-    <img id="artwork" src="">
-    <div id="track"></div>
-    <div id="artist"></div>
-    <div id="album"></div>
-  </div>
-  <div id="recent">
-    <h1>RECENTLY PLAYED</h1>
-    <div id="tracks"></div>
-  </div>
-</div>
+  <script>
+    let username = "brentalexander";
+    
+    function watchdog() {
+      $.get( "https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=" + username + "&api_key=1f633977acf0e2d0630ec11dbc350d3e&format=json", function( data ) 
+      {
+        // now playing
+        let now = data.recenttracks.track[0];
+        if (typeof now["@attr"] != "undefined")
+        {
+          let artist = now.artist["#text"];
+          let name = now.name;     
+          let album = now.album["#text"];
+          let artwork = now.image[3]["#text"];
+          $('#bg').css('backgroundImage', 'url(' + artwork + ')');
+          $("#artwork").attr("src", artwork);
+          $("#track").html(name);
+          $("#artist").html(artist);
+          $('#album').html(album);
+          $('#not-playing').hide();
+        }
+        // recent
+        let recent = data.recenttracks.track;
+        recent.shift();
+        if (recent.length > 1) {
+          $('#tracks').empty();
+          recent.slice(0, 10).forEach(function(track) {
+            let artist = track.artist["#text"];
+            let name = track.name;
+            let album = track.album["#text"];
+            let artwork = track.image[1]["#text"];
+            $('#tracks').append('<div class="track"><div class="artwork"><img src="' + artwork + '"></div><div class="meta"><div class="name">' + name + '</div><div class="artist">' + artist + '</div></div></div>');
+          });
+        }
+        $('#now').fadeIn('slow');
+        $('#recent').fadeIn('slow');
+      });
+    }
+
+    setInterval(function(){ watchdog(); }, 1000);
+  </script>
+  </body>
+</html>
