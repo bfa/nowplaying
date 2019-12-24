@@ -40,6 +40,9 @@
       letter-spacing: 1em;
       opacity: 0.5;
     }
+    #not-playing {
+      display: none; 
+    }
     #now {
       display: none;
       margin: 16px;
@@ -94,6 +97,7 @@
   
   <div id="container">
     <div id="bg"></div>
+    <h1 id="loading">LOADING</h1>
     <h1 id="not-playing">NO MUSIC CURRENTLY PLAYING</h1>
     <div id="now">
       <h1>NOW PLAYING</h1>
@@ -142,6 +146,7 @@
             $('#tracks').append('<div class="track"><div class="artwork"><img src="' + artwork + '"></div><div class="meta"><div class="name">' + name + '</div><div class="artist">' + artist + '</div></div></div>');
           });
         }
+        $('#loading').fadeOut('slow');
         $('#now').fadeIn('slow');
         $('#recent').fadeIn('slow');
       });
